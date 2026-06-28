@@ -26,6 +26,8 @@ import type {
   Invoice,
   BudgetCategory,
   Expense,
+  Client,
+  Interaction,
 } from "../lib/types";
 
 // Point the shared store at THIS repo's data dir before importing it, so the
@@ -855,6 +857,112 @@ server.registerTool(
       uncategorized: byCat["__none"] ?? 0,
     });
   },
+);
+
+/* ------------------------------------------------------------------- clients */
+async function getClient(id: string): Promise<Client | null> {
+  return (await readCollection("clients")).find((c) => c.id === id) ?? null;
+}
+
+server.registerTool(
+  "list_clients",
+  { description: "List CRM clients (leads, active, past) under side work.", inputSchema: {} },
+  async () => text(await readCollection("clients")),
+);
+
+server.registerTool(
+  "add_client",
+  {
+    description: "Add a CRM client. status: lead | active | past (default lead).",
+    inputSchema: {
+      name: z.string(),
+      status: en(T.CLIENT_STATUSES).optional(),
+      contact: z.string().optional(),
+      email: z.string().optional(),
+      phone: z.string().optional(),
+      nextFollowUp: z.string().optional().describe("ISO yyyy-mm-dd"),
+      lastContact: z.string().optional().describe("ISO yyyy-mm-dd"),
+      notes: z.string().optional(),
+    },
+  },
+  async (a) => {
+    const record: Client = {
+      id: newId(),
+      name: a.name,
+      status: a.status ?? "lead",
+      contact: a.contact,
+      email: a.email,
+      phone: a.phone,
+      nextFollowUp: a.nextFollowUp,
+      lastContact: a.lastContact,
+      notes: a.notes,
+      interactions: [],
+    };
+    await upsert("clients", record);
+    return text({ added: record });
+  },
+);
+
+server.registerTool(
+  "update_client",
+  {
+    description: "Update a client by id. Only provided fields change.",
+    inputSchema: {
+      id: z.string(),
+      name: z.string().optional(),
+      status: en(T.CLIENT_STATUSES).optional(),
+      contact: z.string().optional(),
+      email: z.string().optional(),
+      phone: z.string().optional(),
+      nextFollowUp: z.string().optional(),
+      lastContact: z.string().optional(),
+      notes: z.string().optional(),
+    },
+  },
+  async ({ id, ...patch }) => {
+    const cur = await getClient(id);
+    if (!cur) return text(`No client with id ${id}`);
+    const next = { ...cur, ...defined(patch) };
+    await upsert("clients", next);
+    return text({ updated: next });
+  },
+);
+
+server.registerTool(
+  "log_client_interaction",
+  {
+    description:
+      "Log an interaction (note/call/email/meeting) on a client's timeline; also updates lastContact.",
+    inputSchema: {
+      clientId: z.string(),
+      summary: z.string(),
+      type: en(T.INTERACTION_TYPES).optional(),
+      date: z.string().optional().describe("ISO yyyy-mm-dd, default today"),
+    },
+  },
+  async (a) => {
+    const c = await getClient(a.clientId);
+    if (!c) return text(`No client with id ${a.clientId}`);
+    const entry: Interaction = {
+      id: newId(),
+      date: a.date ?? todayISO(),
+      type: a.type ?? "note",
+      summary: a.summary,
+    };
+    await upsert("clients", {
+      ...c,
+      interactions: [entry, ...c.interactions],
+      lastContact: entry.date,
+    });
+    return text({ logged: entry, onClient: c.name });
+  },
+);
+
+server.registerTool(
+  "delete_client",
+  { description: "Delete a client by id.", inputSchema: { id: z.string() } },
+  async ({ id }) =>
+    text((await remove("clients", id)) ? `Deleted ${id}` : `No client ${id}`),
 );
 
 /* ------------------------------------------------------------------- connect */

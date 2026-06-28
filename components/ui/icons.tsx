@@ -35,6 +35,9 @@ import {
   ChevronRight,
   Sun,
   Moon,
+  Users,
+  Phone,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 
@@ -53,6 +56,9 @@ export const Icons = {
   chevronRight: ChevronRight,
   sun: Sun,
   moon: Moon,
+  clients: Users,
+  phone: Phone,
+  mail: Mail,
   partTime: Clock3,
   personal: Sparkles,
   flame: Flame,

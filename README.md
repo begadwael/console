@@ -24,6 +24,9 @@ can back up, edit by hand, or sync however you like.
   rejected) with next-action reminders and due-date coloring.
 - **Side work** — a task board (to do / in progress / blocked / done) with priority
   and due dates for your freelance / client work.
+- **Clients (CRM)** — a Lead → Active → Past pipeline under side work. Each client has
+  contact details, a next-follow-up date (overdue-highlighted), an interaction log
+  (note / call / email / meeting), and live counts of their linked projects & invoices.
 - **Projects** — each project is its own workspace: a **Tasks** kanban with subtask
   checklists, a **Timeline** of milestones, and **Documents** (external links *or*
   files uploaded to your laptop). Reusable **project templates** included.
@@ -84,10 +87,11 @@ session can read and update your dashboard in plain language — *"add a job at 
 budget this month?"*. It writes the same `data/*.json` files, so changes appear on the
 next dashboard refresh. No dev server required.
 
-It exposes ~39 tools: `get_overview`, `list/add/update/delete` for jobs, side-work
-tasks, part-time, personal, projects, and invoices — plus `add_project_task` (with
-subtasks), `add_milestone`, `add_project_link`, `add_invoice`,
-`create_project_from_template`, `add_expense`, `get_budget`, and more.
+It exposes ~44 tools: `get_overview`, `list/add/update/delete` for jobs, side-work
+tasks, part-time, personal, projects, invoices, and clients — plus `add_project_task`
+(with subtasks), `add_milestone`, `add_project_link`, `add_invoice`,
+`create_project_from_template`, `add_expense`, `get_budget`,
+`log_client_interaction`, and more.
 
 **Claude Code** — already wired up via [`.mcp.json`](.mcp.json). Open the repo in a
 Claude Code session, approve the `console` server when prompted, then just ask.
@@ -118,6 +122,7 @@ Run it standalone to debug with `npm run mcp`.
 | --- | --- |
 | `app/page.tsx` | Overview — aggregates every module |
 | `app/calendar/` · `app/jobs/` · `app/sidework/` | Calendar, job pipeline, side-work board |
+| `app/sidework/clients/` | Clients CRM — Lead/Active/Past pipeline with interaction logs |
 | `app/projects/` | Projects list + per-project page (`[id]`) and templates |
 | `app/income/` · `app/budget/` · `app/part-time/` · `app/personal/` | Money, time & habits |
 | `app/api/files/[...path]/` | Serves uploaded files from `data/uploads/` (path-traversal guarded) |

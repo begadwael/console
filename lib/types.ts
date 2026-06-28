@@ -202,6 +202,34 @@ export interface Expense {
   note?: string;
 }
 
+// ---- Clients (CRM, under side work) ----
+export const CLIENT_STATUSES = ["lead", "active", "past"] as const;
+export type ClientStatus = (typeof CLIENT_STATUSES)[number];
+
+export const INTERACTION_TYPES = ["note", "call", "email", "meeting"] as const;
+export type InteractionType = (typeof INTERACTION_TYPES)[number];
+
+// A logged touchpoint with a client (the CRM activity timeline).
+export interface Interaction {
+  id: ID;
+  date: string; // ISO yyyy-mm-dd
+  type: InteractionType;
+  summary: string;
+}
+
+export interface Client {
+  id: ID;
+  name: string; // company or person
+  contact?: string; // primary contact person
+  email?: string;
+  phone?: string;
+  status: ClientStatus;
+  nextFollowUp?: string; // ISO yyyy-mm-dd
+  lastContact?: string; // ISO yyyy-mm-dd
+  notes?: string;
+  interactions: Interaction[];
+}
+
 // Map of collection name -> record type, used by the store helpers.
 export interface Collections {
   jobs: Job;
@@ -213,5 +241,6 @@ export interface Collections {
   templates: ProjectTemplate;
   "budget-categories": BudgetCategory;
   expenses: Expense;
+  clients: Client;
 }
 export type CollectionName = keyof Collections;

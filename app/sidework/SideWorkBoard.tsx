@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import {
   TASK_STATUSES,
@@ -88,10 +89,19 @@ export function SideWorkBoard({ tasks }: { tasks: SideWorkTask[] }) {
         subtitle="Drag tasks across stages as you make progress."
         accent={MODULE.sidework.color}
         action={
-          <Button variant="primary" onClick={() => setDraft(emptyTask())}>
-            <Icons.plus size={16} />
-            Add task
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/sidework/clients"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
+            >
+              <Icons.clients size={15} />
+              Clients
+            </Link>
+            <Button variant="primary" onClick={() => setDraft(emptyTask())}>
+              <Icons.plus size={16} />
+              Add task
+            </Button>
+          </div>
         }
       />
 

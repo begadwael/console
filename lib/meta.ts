@@ -10,6 +10,7 @@ import type {
   ProjectStatus,
   ProjectTaskStatus,
   InvoiceStatus,
+  ClientStatus,
 } from "./types";
 
 export const MODULE = {
@@ -88,4 +89,13 @@ export const PERSONAL_TYPE_META: Record<
   habit: { label: "Habit", color: "#34d3b4" },
   goal: { label: "Goal", color: "#f5b455" },
   todo: { label: "To-do", color: "#5b9dff" },
+};
+
+export const CLIENT_STATUS_META: Record<
+  ClientStatus,
+  { label: string; color: string }
+> = {
+  lead: { label: "Lead", color: "#f5b455" },
+  active: { label: "Active", color: "#56d364" },
+  past: { label: "Past", color: "#8b97ad" },
 };

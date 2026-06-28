@@ -17,7 +17,12 @@ import type { CollectionName } from "@/lib/types";
 // covers just the four lightweight capture modules.
 type Mod = Exclude<
   CollectionName,
-  "projects" | "invoices" | "templates" | "budget-categories" | "expenses"
+  | "projects"
+  | "invoices"
+  | "templates"
+  | "budget-categories"
+  | "expenses"
+  | "clients"
 >;
 const MODS: Mod[] = ["jobs", "sidework", "part-time", "personal"];
 
