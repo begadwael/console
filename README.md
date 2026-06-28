@@ -163,4 +163,4 @@ Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · lucide-react · dnd-k
 
 ## License
 
-MIT — add a `LICENSE` file before sharing if you want it explicit.
+[MIT](LICENSE) — free to use, modify, and share.
