@@ -1,0 +1,35 @@
+[
+  {
+    "id": "seed-personal-1",
+    "type": "habit",
+    "title": "Morning workout",
+    "cadence": "daily",
+    "streak": 5,
+    "lastDone": "2026-06-27",
+    "notes": ""
+  },
+  {
+    "id": "seed-personal-2",
+    "type": "habit",
+    "title": "Read 20 minutes",
+    "cadence": "daily",
+    "streak": 12,
+    "lastDone": "2026-06-28",
+    "notes": "Currently on a systems design book."
+  },
+  {
+    "id": "seed-personal-3",
+    "type": "goal",
+    "title": "Finish portfolio site refresh",
+    "cadence": "this month",
+    "done": false,
+    "notes": "New case studies + dark mode."
+  },
+  {
+    "id": "seed-personal-4",
+    "type": "todo",
+    "title": "Renew gym membership",
+    "done": false,
+    "notes": ""
+  }
+]

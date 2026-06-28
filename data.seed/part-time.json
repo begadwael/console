@@ -1,0 +1,26 @@
+[
+  {
+    "id": "seed-pt-1",
+    "date": "2026-06-28",
+    "task": "Support shift — ticket triage",
+    "hours": 4,
+    "done": false,
+    "notes": "Cover afternoon queue."
+  },
+  {
+    "id": "seed-pt-2",
+    "date": "2026-06-27",
+    "task": "Weekly report compile",
+    "hours": 2,
+    "done": true,
+    "notes": ""
+  },
+  {
+    "id": "seed-pt-3",
+    "date": "2026-06-25",
+    "task": "Onboarding doc updates",
+    "hours": 3,
+    "done": true,
+    "notes": ""
+  }
+]

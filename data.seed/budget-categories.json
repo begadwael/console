@@ -1,0 +1,8 @@
+[
+  { "id": "cat-rent", "name": "Rent & bills", "monthlyLimit": 1500, "color": "#818cf8" },
+  { "id": "cat-groceries", "name": "Groceries", "monthlyLimit": 500, "color": "#34d399" },
+  { "id": "cat-transport", "name": "Transport", "monthlyLimit": 150, "color": "#38bdf8" },
+  { "id": "cat-subs", "name": "Subscriptions", "monthlyLimit": 80, "color": "#a78bfa" },
+  { "id": "cat-eatingout", "name": "Eating out", "monthlyLimit": 250, "color": "#fb7185" },
+  { "id": "cat-misc", "name": "Misc", "monthlyLimit": 200, "color": "#94a3b8" }
+]

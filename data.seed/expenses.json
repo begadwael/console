@@ -1,0 +1,19 @@
+[
+  { "id": "exp-1", "date": "2026-06-01", "amount": 1500, "categoryId": "cat-rent", "note": "June rent" },
+  { "id": "exp-2", "date": "2026-06-03", "amount": 72.4, "categoryId": "cat-groceries" },
+  { "id": "exp-3", "date": "2026-06-08", "amount": 64.1, "categoryId": "cat-groceries" },
+  { "id": "exp-4", "date": "2026-06-15", "amount": 88.3, "categoryId": "cat-groceries" },
+  { "id": "exp-5", "date": "2026-06-22", "amount": 59.0, "categoryId": "cat-groceries" },
+  { "id": "exp-6", "date": "2026-06-05", "amount": 45, "categoryId": "cat-transport", "note": "Transit pass" },
+  { "id": "exp-7", "date": "2026-06-18", "amount": 32, "categoryId": "cat-transport" },
+  { "id": "exp-8", "date": "2026-06-02", "amount": 15.99, "categoryId": "cat-subs", "note": "Streaming" },
+  { "id": "exp-9", "date": "2026-06-02", "amount": 12, "categoryId": "cat-subs", "note": "Music" },
+  { "id": "exp-10", "date": "2026-06-06", "amount": 42, "categoryId": "cat-eatingout", "note": "Dinner out" },
+  { "id": "exp-11", "date": "2026-06-12", "amount": 28, "categoryId": "cat-eatingout" },
+  { "id": "exp-12", "date": "2026-06-19", "amount": 64, "categoryId": "cat-eatingout", "note": "Birthday dinner" },
+  { "id": "exp-13", "date": "2026-06-24", "amount": 38, "categoryId": "cat-eatingout" },
+  { "id": "exp-14", "date": "2026-06-26", "amount": 55, "categoryId": "cat-eatingout" },
+  { "id": "exp-15", "date": "2026-06-20", "amount": 35, "categoryId": "cat-eatingout" },
+  { "id": "exp-16", "date": "2026-06-10", "amount": 60, "categoryId": "cat-misc", "note": "Household" },
+  { "id": "exp-17", "date": "2026-06-21", "amount": 25, "categoryId": "cat-misc" }
+]

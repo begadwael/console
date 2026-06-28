@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+/* ============================================================
+   "Console" — a calm personal operations console.
+   Deep near-black chrome, hairline borders, one accent per
+   module carried as a thin indicator. Technical type system:
+   Space Grotesk (display) · Inter (body) · JetBrains Mono (data).
+   ============================================================ */
+/* ---- Dark (default) ---- */
+:root {
+  color-scheme: dark;
+
+  --bg: #07080c;
+  --bg-elevated: #0b0d14;
+  --surface: #10131c;
+  --surface-hover: #161a25;
+  --surface-active: #1b2030;
+  --border: #1d212d;
+  --border-strong: #2b3140;
+
+  --text: #eef1f7;
+  --text-muted: #939bac;
+  --text-faint: #5c6371;
+
+  /* accent has two roles: ink (text/links/rings) and fill (buttons).
+     Fill stays a light blue with dark text in both themes; ink deepens
+     in light mode for contrast on white. */
+  --accent: #5b9dff;
+  --accent-strong: #3d86ff;
+  --accent-fill: #5b9dff;
+
+  /* module accents — tuned to sit together without going rainbow */
+  --jobs: #5b9dff;
+  --sidework: #a78bfa;
+  --projects: #f472b6;
+  --income: #34d399;
+  --budget: #fb923c;
+  --parttime: #34d3b4;
+  --personal: #f5b455;
+
+  --danger: #f4717b;
+  --success: #56d364;
+  --warning: #f5b455;
+
+  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
+    0 8px 24px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Light ---- designed as its own palette (soft cool paper, not an
+   inverted dark theme), with deeper ink + status colors for contrast. */
+html.light {
+  color-scheme: light;
+
+  --bg: #eef0f4;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-hover: #f3f5f8;
+  --surface-active: #e9edf2;
+  --border: #e3e7ee;
+  --border-strong: #ccd3de;
+
+  --text: #161a23;
+  --text-muted: #586071;
+  --text-faint: #8a93a3;
+
+  --accent: #2f6fe0;
+  --accent-strong: #245bc4;
+  --accent-fill: #5b9dff;
+
+  --jobs: #2f6fe0;
+  --sidework: #8b5cf6;
+  --projects: #db2f7d;
+  --income: #0f9b6c;
+  --budget: #e07b1f;
+  --parttime: #0d9488;
+  --personal: #c77d11;
+
+  --danger: #dc2f3a;
+  --success: #1f9d57;
+  --warning: #c77d11;
+
+  --shadow-card: 0 1px 2px 0 rgba(16, 24, 40, 0.04),
+    0 8px 24px -14px rgba(16, 24, 40, 0.14);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-fill: var(--accent-fill);
+  --color-jobs: var(--jobs);
+  --color-sidework: var(--sidework);
+  --color-projects: var(--projects);
+  --color-income: var(--income);
+  --color-budget: var(--budget);
+  --color-parttime: var(--parttime);
+  --color-personal: var(--personal);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+/* Eyebrow micro-label — the recurring "instrument panel" device. */
+.eyebrow {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* Tabular numerics for all counts, dates, hours, streaks. */
+.tnum {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Thin, unobtrusive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+input,
+textarea,
+select {
+  color-scheme: inherit;
+}
+
+/* Horizontally-scrollable nav/strips where a visible bar would be noise. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Visible keyboard focus everywhere, but not on mouse click. */
+:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent) 70%, transparent);
+  outline-offset: 2px;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-overlay-in {
+  animation: overlay-in 160ms ease-out;
+}
+.animate-panel-in {
+  animation: panel-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

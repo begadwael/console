@@ -1,0 +1,59 @@
+[
+  {
+    "id": "seed-tpl-1",
+    "name": "Brand project",
+    "description": "Standard end-to-end branding engagement.",
+    "sidework": true,
+    "color": "#f472b6",
+    "durationDays": 35,
+    "milestones": [
+      { "title": "Kickoff & discovery", "offsetDays": 2 },
+      { "title": "Concepts presented", "offsetDays": 14 },
+      { "title": "Design sign-off", "offsetDays": 25 },
+      { "title": "Launch", "offsetDays": 35 }
+    ],
+    "tasks": [
+      {
+        "title": "Logo suite",
+        "priority": "high",
+        "offsetDays": 14,
+        "subtasks": ["Primary mark", "Monochrome variants"]
+      },
+      {
+        "title": "Brand guidelines",
+        "priority": "medium",
+        "offsetDays": 21,
+        "subtasks": ["Colour & type", "Voice & tone", "Usage examples"]
+      },
+      { "title": "Launch assets", "priority": "medium", "offsetDays": 32 }
+    ],
+    "documents": [
+      { "title": "Creative brief" },
+      { "title": "Figma — design file" }
+    ]
+  },
+  {
+    "id": "seed-tpl-2",
+    "name": "Website build",
+    "description": "Marketing website from design to deploy.",
+    "sidework": true,
+    "color": "#5b9dff",
+    "durationDays": 30,
+    "milestones": [
+      { "title": "Content & sitemap", "offsetDays": 5 },
+      { "title": "Design approved", "offsetDays": 15 },
+      { "title": "Go live", "offsetDays": 30 }
+    ],
+    "tasks": [
+      {
+        "title": "Design pages",
+        "priority": "high",
+        "offsetDays": 15,
+        "subtasks": ["Home", "About", "Case studies"]
+      },
+      { "title": "Build & integrate CMS", "priority": "high", "offsetDays": 25 },
+      { "title": "QA & deploy", "priority": "medium", "offsetDays": 30 }
+    ],
+    "documents": [{ "title": "Content doc" }]
+  }
+]

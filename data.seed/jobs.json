@@ -1,0 +1,42 @@
+[
+  {
+    "id": "seed-job-1",
+    "company": "Nimbus",
+    "role": "Frontend Engineer",
+    "status": "interviewing",
+    "appliedDate": "2026-06-15",
+    "nextAction": "Technical screen with hiring manager",
+    "nextActionDate": "2026-06-30",
+    "link": "https://example.com/careers",
+    "notes": "Recruiter call went well. Prep system design."
+  },
+  {
+    "id": "seed-job-2",
+    "company": "Cortex",
+    "role": "Product Engineer",
+    "status": "applied",
+    "appliedDate": "2026-06-22",
+    "nextAction": "Follow up if no reply",
+    "nextActionDate": "2026-07-02",
+    "link": "https://example.com/careers",
+    "notes": "Referred by ex-colleague."
+  },
+  {
+    "id": "seed-job-3",
+    "company": "Bluebird",
+    "role": "Full-stack Engineer",
+    "status": "saved",
+    "nextAction": "Tailor resume and apply",
+    "nextActionDate": "2026-06-29",
+    "link": "https://example.com/careers",
+    "notes": "Remote-friendly. Strong OSS culture."
+  },
+  {
+    "id": "seed-job-4",
+    "company": "Pangea",
+    "role": "Software Engineer",
+    "status": "rejected",
+    "appliedDate": "2026-05-28",
+    "notes": "Auto-reject after 2 weeks. Try again next cycle."
+  }
+]

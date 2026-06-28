@@ -1,0 +1,38 @@
+[
+  {
+    "id": "seed-sidework-1",
+    "title": "Ship client proposal draft",
+    "client": "Acme Corp",
+    "status": "doing",
+    "priority": "high",
+    "dueDate": "2026-06-29",
+    "notes": "Use Side work branded template. Include pricing tiers."
+  },
+  {
+    "id": "seed-sidework-2",
+    "title": "Review motion graphics storyboard",
+    "client": "Northwind",
+    "status": "todo",
+    "priority": "medium",
+    "dueDate": "2026-07-01",
+    "notes": ""
+  },
+  {
+    "id": "seed-sidework-3",
+    "title": "Invoice June retainer",
+    "client": "Acme Corp",
+    "status": "todo",
+    "priority": "high",
+    "dueDate": "2026-06-30",
+    "notes": ""
+  },
+  {
+    "id": "seed-sidework-4",
+    "title": "Kickoff call notes write-up",
+    "client": "Northwind",
+    "status": "done",
+    "priority": "low",
+    "dueDate": "2026-06-26",
+    "notes": "Sent to team."
+  }
+]

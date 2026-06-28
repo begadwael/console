@@ -1,0 +1,116 @@
+[
+  {
+    "id": "seed-project-1",
+    "name": "Acme Brand Refresh",
+    "description": "End-to-end rebrand: new identity, website, and launch assets.",
+    "status": "active",
+    "sidework": true,
+    "client": "Acme Corp",
+    "color": "#f472b6",
+    "startDate": "2026-06-10",
+    "dueDate": "2026-07-15",
+    "createdAt": "2026-06-10T09:00:00.000Z",
+    "milestones": [
+      { "id": "m1", "title": "Kickoff & discovery", "date": "2026-06-12", "done": true },
+      { "id": "m2", "title": "Identity concepts presented", "date": "2026-06-24", "done": true },
+      { "id": "m3", "title": "Website design sign-off", "date": "2026-07-02", "done": false },
+      { "id": "m4", "title": "Launch", "date": "2026-07-15", "done": false }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "title": "Logo suite",
+        "status": "done",
+        "priority": "high",
+        "dueDate": "2026-06-24",
+        "subtasks": [
+          { "id": "s1", "title": "Primary mark", "done": true },
+          { "id": "s2", "title": "Monochrome variants", "done": true }
+        ]
+      },
+      {
+        "id": "t2",
+        "title": "Brand guidelines PDF",
+        "description": "Cover colour, type, voice, and usage rules.",
+        "status": "in_progress",
+        "priority": "medium",
+        "dueDate": "2026-07-01",
+        "subtasks": [
+          { "id": "s3", "title": "Colour & type pages", "done": true },
+          { "id": "s4", "title": "Voice & tone", "done": false },
+          { "id": "s5", "title": "Do / don't examples", "done": false }
+        ]
+      },
+      {
+        "id": "t3",
+        "title": "Marketing website",
+        "status": "in_progress",
+        "priority": "high",
+        "dueDate": "2026-07-08",
+        "subtasks": [
+          { "id": "s6", "title": "Home + about", "done": false },
+          { "id": "s7", "title": "Case studies", "done": false }
+        ]
+      },
+      {
+        "id": "t4",
+        "title": "Waiting on client copy",
+        "status": "blocked",
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": "t5",
+        "title": "Launch social kit",
+        "status": "todo",
+        "priority": "low",
+        "dueDate": "2026-07-14",
+        "subtasks": []
+      }
+    ],
+    "documents": [
+      { "id": "doc1", "title": "Creative brief", "kind": "link", "url": "https://example.com/brief", "note": "Signed off by client." },
+      { "id": "doc2", "title": "Figma — design file", "kind": "link", "url": "https://figma.com" },
+      { "id": "doc3", "title": "Asset drive", "kind": "link", "url": "https://drive.google.com" }
+    ]
+  },
+  {
+    "id": "seed-project-2",
+    "name": "Portfolio Site v2",
+    "description": "Personal site refresh with new case studies and dark mode.",
+    "status": "paused",
+    "sidework": false,
+    "color": "#5b9dff",
+    "startDate": "2026-05-20",
+    "dueDate": "2026-08-01",
+    "createdAt": "2026-05-20T09:00:00.000Z",
+    "milestones": [
+      { "id": "pm1", "title": "Content outline", "date": "2026-05-28", "done": true },
+      { "id": "pm2", "title": "Design pass", "date": "2026-07-20", "done": false }
+    ],
+    "tasks": [
+      {
+        "id": "pt1",
+        "title": "Write 3 case studies",
+        "status": "in_progress",
+        "priority": "medium",
+        "dueDate": "2026-07-18",
+        "subtasks": [
+          { "id": "ps1", "title": "Project A", "done": true },
+          { "id": "ps2", "title": "Project B", "done": false },
+          { "id": "ps3", "title": "Project C", "done": false }
+        ]
+      },
+      {
+        "id": "pt2",
+        "title": "Build & deploy",
+        "status": "todo",
+        "priority": "low",
+        "subtasks": []
+      }
+    ],
+    "documents": [
+      { "id": "pdoc1", "title": "Notes doc", "kind": "link", "url": "https://notion.so" }
+    ]
+  }
+]

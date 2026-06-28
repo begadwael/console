@@ -1,0 +1,53 @@
+[
+  {
+    "id": "seed-inv-1",
+    "client": "Acme Corp",
+    "title": "June retainer",
+    "projectId": "seed-project-1",
+    "amount": 3500,
+    "currency": "USD",
+    "status": "sent",
+    "issuedDate": "2026-06-20",
+    "dueDate": "2026-06-30"
+  },
+  {
+    "id": "seed-inv-2",
+    "client": "Globex",
+    "title": "Logo package",
+    "amount": 900,
+    "currency": "USD",
+    "status": "sent",
+    "issuedDate": "2026-06-05",
+    "dueDate": "2026-06-20"
+  },
+  {
+    "id": "seed-inv-3",
+    "client": "Northwind",
+    "title": "Storyboard milestone",
+    "amount": 1200,
+    "currency": "USD",
+    "status": "paid",
+    "issuedDate": "2026-06-01",
+    "dueDate": "2026-06-15",
+    "paidDate": "2026-06-14"
+  },
+  {
+    "id": "seed-inv-4",
+    "client": "Acme Corp",
+    "title": "May retainer",
+    "amount": 3500,
+    "currency": "USD",
+    "status": "paid",
+    "issuedDate": "2026-05-20",
+    "dueDate": "2026-05-31",
+    "paidDate": "2026-05-29"
+  },
+  {
+    "id": "seed-inv-5",
+    "client": "Initech",
+    "title": "Discovery workshop",
+    "amount": 1500,
+    "currency": "USD",
+    "status": "draft"
+  }
+]
