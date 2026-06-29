@@ -1,0 +1,7 @@
+[
+  { "id": "acct-software", "name": "Software & subscriptions", "color": "#5b9dff" },
+  { "id": "acct-contractors", "name": "Contractors", "color": "#a371f7" },
+  { "id": "acct-travel", "name": "Travel", "color": "#f5b455" },
+  { "id": "acct-taxes", "name": "Taxes & fees", "color": "#f4717b" },
+  { "id": "acct-office", "name": "Office & equipment", "color": "#56d364" }
+]

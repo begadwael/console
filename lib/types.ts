@@ -141,18 +141,65 @@ export interface Project {
 export const INVOICE_STATUSES = ["draft", "sent", "paid"] as const;
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 
+// Where the money lands. Free-form is allowed, but these are the presets the
+// UI offers and the MCP server documents.
+export const PAYMENT_CHANNELS = [
+  "bank",
+  "wise",
+  "paypal",
+  "stripe",
+  "cash",
+  "cheque",
+  "crypto",
+  "other",
+] as const;
+export type PaymentChannel = (typeof PAYMENT_CHANNELS)[number];
+
 export interface Invoice {
   id: ID;
   client: string;
   title?: string;
   projectId?: string; // optional link to a project
   amount: number;
-  currency?: string; // ISO code, default AED
+  currency?: string; // ISO code, default USD
   status: InvoiceStatus;
+  channel?: string; // payment channel (see PAYMENT_CHANNELS) — free-form allowed
   issuedDate?: string; // ISO yyyy-mm-dd
   dueDate?: string; // ISO yyyy-mm-dd
   paidDate?: string; // ISO yyyy-mm-dd
   notes?: string;
+  recurringId?: string; // set when generated from a RecurringInvoice schedule
+  attachmentPath?: string; // uploaded invoice file, relative path under data/uploads
+  attachmentName?: string; // original filename of the attachment
+}
+
+// ---- Recurring invoices (schedules) ----
+// A schedule is a billing template that issues a new draft invoice on a cadence,
+// typically against a project (e.g. a monthly retainer). Issuing is explicit —
+// "Generate" creates the invoice and advances nextDate — so nothing bills behind
+// your back.
+export const INVOICE_CADENCES = [
+  "weekly",
+  "monthly",
+  "quarterly",
+  "yearly",
+] as const;
+export type InvoiceCadence = (typeof INVOICE_CADENCES)[number];
+
+export interface RecurringInvoice {
+  id: ID;
+  client: string;
+  title?: string;
+  projectId?: string; // the project this recurring bill belongs to
+  amount: number;
+  currency?: string; // ISO code, default USD
+  channel?: string; // payment channel
+  cadence: InvoiceCadence;
+  nextDate: string; // ISO yyyy-mm-dd — when the next invoice should be issued
+  dueDays?: number; // due = issue + dueDays (default 14)
+  active: boolean; // paused schedules don't surface as "due"
+  notes?: string;
+  lastGenerated?: string; // ISO date the last invoice was issued from this
 }
 
 // ---- Project templates ----
@@ -202,6 +249,55 @@ export interface Expense {
   note?: string;
 }
 
+// ---- Payment plans (irregular invoice schedules) ----
+// A plan groups several one-off installments billed on arbitrary dates against
+// one project/client (e.g. 30% on signing, 40% at go-live, 30% on delivery).
+// Each installment issues its own invoice when you generate it — unlike a
+// RecurringInvoice, there's no fixed cadence.
+export interface PlanInstallment {
+  id: ID;
+  label?: string; // e.g. "Deposit", "Phase 1", "Go-live"
+  date: string; // ISO yyyy-mm-dd — scheduled issue date (arbitrary)
+  amount: number;
+  invoiceId?: string; // set once an invoice has been generated for it
+}
+
+export interface PaymentPlan {
+  id: ID;
+  name: string;
+  client: string;
+  projectId?: string;
+  currency?: string; // ISO code, default USD
+  channel?: string; // default payment channel for generated invoices
+  dueDays?: number; // payment terms: invoice due = issue + dueDays (default 14)
+  installments: PlanInstallment[];
+  notes?: string;
+  createdAt: string;
+}
+
+// ---- Finance: work expenses & accounts (under Side work) ----
+// Distinct from the personal Budget's Expense/BudgetCategory. A FinanceExpense
+// is a business cost: either a project cost (projectId) and/or filed under a
+// named ExpenseAccount (Software, Travel, Taxes…). Both links are optional.
+export interface ExpenseAccount {
+  id: ID;
+  name: string;
+  color?: string;
+}
+
+export interface FinanceExpense {
+  id: ID;
+  date: string; // ISO yyyy-mm-dd
+  amount: number;
+  currency?: string; // ISO code, default USD
+  vendor?: string; // who was paid
+  description?: string;
+  accountId?: string; // references an ExpenseAccount (general expense bucket)
+  projectId?: string; // references a Project (project cost)
+  channel?: string; // payment channel (see PAYMENT_CHANNELS)
+  notes?: string;
+}
+
 // ---- Clients (CRM, under side work) ----
 export const CLIENT_STATUSES = ["lead", "active", "past"] as const;
 export type ClientStatus = (typeof CLIENT_STATUSES)[number];
@@ -238,6 +334,10 @@ export interface Collections {
   personal: PersonalItem;
   projects: Project;
   invoices: Invoice;
+  "recurring-invoices": RecurringInvoice;
+  "payment-plans": PaymentPlan;
+  "finance-expenses": FinanceExpense;
+  "expense-accounts": ExpenseAccount;
   templates: ProjectTemplate;
   "budget-categories": BudgetCategory;
   expenses: Expense;

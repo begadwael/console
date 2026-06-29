@@ -45,6 +45,8 @@ const TONE_COLOR = {
   later: "var(--text-faint)",
 } as const;
 
+type TabKey = "tasks" | "timeline" | "documents" | "finance";
+
 const TASK_COLUMNS: Column[] = PROJECT_TASK_STATUSES.map((s) => ({
   id: s,
   label: PROJECT_TASK_STATUS_META[s].label,
@@ -62,7 +64,13 @@ function formatBytes(n?: number): string {
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
 
-export function ProjectDetail({ project: initial }: { project: Project }) {
+export function ProjectDetail({
+  project: initial,
+  financeSlot,
+}: {
+  project: Project;
+  financeSlot?: React.ReactNode;
+}) {
   const [project, setProject] = useState(initial);
   const [prevSig, setPrevSig] = useState("");
   const [pending, startTransition] = useTransition();
@@ -76,6 +84,7 @@ export function ProjectDetail({ project: initial }: { project: Project }) {
   const [docDraft, setDocDraft] = useState<ProjectDoc | null>(null);
   const [subInput, setSubInput] = useState("");
   const [tplName, setTplName] = useState<string | null>(null);
+  const [tab, setTab] = useState<TabKey>("tasks");
 
   // Sync from server on load / external changes; local stays source of truth.
   const sig = `${initial.id}:${initial.name}:${initial.status}:${initial.sidework}:${initial.milestones.length}:${initial.tasks.length}:${initial.documents.length}`;
@@ -307,8 +316,42 @@ export function ProjectDetail({ project: initial }: { project: Project }) {
         </CardBody>
       </Card>
 
-      {/* Tasks board */}
-      <section className="mb-6">
+      {/* ---- Tabs ---- */}
+      <div className="mb-5 flex gap-1 overflow-x-auto rounded-lg border border-border-strong bg-bg-elevated p-1">
+        {(
+          [
+            { key: "tasks", label: "Tasks", icon: Icons.todo, count: project.tasks.length },
+            { key: "timeline", label: "Timeline", icon: Icons.milestone, count: project.milestones.length },
+            { key: "documents", label: "Documents", icon: Icons.doc, count: project.documents.length },
+            { key: "finance", label: "Finance", icon: Icons.finance },
+          ] as { key: TabKey; label: string; icon: typeof Icons.todo; count?: number }[]
+        ).map((t) => {
+          const active = tab === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                active
+                  ? "bg-surface-active text-text"
+                  : "text-text-muted hover:text-text",
+              )}
+              style={active ? { color: accent } : undefined}
+            >
+              <t.icon size={15} />
+              {t.label}
+              {typeof t.count === "number" && t.count > 0 ? (
+                <span className="tnum text-[11px] text-text-faint">{t.count}</span>
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ---- Tasks panel ---- */}
+      {tab === "tasks" ? (
+        <section className="mb-6">
         <div className="mb-3 flex items-center gap-2.5">
           <span
             className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-bg-elevated"
@@ -386,11 +429,12 @@ export function ProjectDetail({ project: initial }: { project: Project }) {
             }}
           />
         )}
-      </section>
+        </section>
+      ) : null}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {/* Timeline */}
-        <Card className="lg:col-span-2" accent={accent}>
+      {/* ---- Timeline panel ---- */}
+      {tab === "timeline" ? (
+        <Card accent={accent}>
           <CardHeader
             title="Timeline"
             subtitle="Milestones in date order"
@@ -468,8 +512,10 @@ export function ProjectDetail({ project: initial }: { project: Project }) {
             )}
           </CardBody>
         </Card>
+      ) : null}
 
-        {/* Documents */}
+      {/* ---- Documents panel ---- */}
+      {tab === "documents" ? (
         <Card accent={accent}>
           <CardHeader
             title="Documents"
@@ -567,7 +613,10 @@ export function ProjectDetail({ project: initial }: { project: Project }) {
             )}
           </CardBody>
         </Card>
-      </div>
+      ) : null}
+
+      {/* ---- Finance panel ---- */}
+      {tab === "finance" ? <div className="mb-6">{financeSlot}</div> : null}
 
       {/* ---- Edit project meta ---- */}
       <ProjectMetaModal

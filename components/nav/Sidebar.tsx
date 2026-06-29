@@ -28,12 +28,6 @@ const NAV: {
     color: "var(--projects)",
   },
   {
-    href: "/income",
-    label: "Income",
-    icon: Icons.income,
-    color: "var(--income)",
-  },
-  {
     href: "/budget",
     label: "Budget",
     icon: Icons.budget,

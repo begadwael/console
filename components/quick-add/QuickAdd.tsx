@@ -19,6 +19,10 @@ type Mod = Exclude<
   CollectionName,
   | "projects"
   | "invoices"
+  | "recurring-invoices"
+  | "payment-plans"
+  | "finance-expenses"
+  | "expense-accounts"
   | "templates"
   | "budget-categories"
   | "expenses"

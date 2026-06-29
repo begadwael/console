@@ -10,6 +10,8 @@ import type {
   ProjectStatus,
   ProjectTaskStatus,
   InvoiceStatus,
+  InvoiceCadence,
+  PaymentChannel,
   ClientStatus,
 } from "./types";
 
@@ -17,7 +19,8 @@ export const MODULE = {
   jobs: { label: "Job search", color: "var(--jobs)", href: "/jobs" },
   sidework: { label: "Side work", color: "var(--sidework)", href: "/sidework" },
   projects: { label: "Projects", color: "var(--projects)", href: "/projects" },
-  income: { label: "Income", color: "var(--income)", href: "/income" },
+  income: { label: "Income", color: "var(--income)", href: "/sidework/finance" },
+  finance: { label: "Finance", color: "var(--income)", href: "/sidework/finance" },
   budget: { label: "Budget", color: "var(--budget)", href: "/budget" },
   "part-time": {
     label: "Part-time",
@@ -35,6 +38,57 @@ export const INVOICE_STATUS_META: Record<
   sent: { label: "Sent", color: "#5b9dff" },
   paid: { label: "Paid", color: "#34d399" },
 };
+
+export const INVOICE_CADENCE_META: Record<
+  InvoiceCadence,
+  { label: string; adjective: string }
+> = {
+  weekly: { label: "Weekly", adjective: "/week" },
+  monthly: { label: "Monthly", adjective: "/month" },
+  quarterly: { label: "Quarterly", adjective: "/quarter" },
+  yearly: { label: "Yearly", adjective: "/year" },
+};
+
+// Payment channels — label + icon key (from components/ui/icons). The icon key
+// is referenced loosely so adding free-form channels never breaks the build.
+export const PAYMENT_CHANNEL_META: Record<
+  PaymentChannel,
+  { label: string; icon: string }
+> = {
+  bank: { label: "Bank transfer", icon: "bank" },
+  wise: { label: "Wise", icon: "send" },
+  paypal: { label: "PayPal", icon: "wallet" },
+  stripe: { label: "Stripe", icon: "card" },
+  cash: { label: "Cash", icon: "wallet" },
+  cheque: { label: "Cheque", icon: "doc" },
+  crypto: { label: "Crypto", icon: "coins" },
+  other: { label: "Other", icon: "wallet" },
+};
+
+// Resolve a (possibly free-form) channel string to a display label.
+export function channelLabel(channel?: string): string | null {
+  if (!channel) return null;
+  return (
+    PAYMENT_CHANNEL_META[channel as PaymentChannel]?.label ?? channel
+  );
+}
+
+// Palette cycled through when creating new expense accounts that don't pick a
+// color. Mirrors the status/module hues so the app reads as one set.
+export const ACCOUNT_PALETTE = [
+  "#5b9dff",
+  "#a371f7",
+  "#f5b455",
+  "#f4717b",
+  "#56d364",
+  "#34d399",
+  "#8b97ad",
+  "#e879a6",
+] as const;
+
+export function accountColor(i: number): string {
+  return ACCOUNT_PALETTE[i % ACCOUNT_PALETTE.length];
+}
 
 export const PROJECT_STATUS_META: Record<
   ProjectStatus,

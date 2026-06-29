@@ -24,6 +24,11 @@ import type {
   ProjectDoc,
   Subtask,
   Invoice,
+  RecurringInvoice,
+  PaymentPlan,
+  PlanInstallment,
+  FinanceExpense,
+  ExpenseAccount,
   BudgetCategory,
   Expense,
   Client,
@@ -41,6 +46,9 @@ const { readCollection, upsert, remove } = await import("../lib/store");
 const { newId, todayISO } = await import("../lib/utils");
 const { projectProgress } = await import("../lib/projects");
 const { instantiateTemplate } = await import("../lib/templates");
+const { advanceDate, materializeInvoice } = await import("../lib/invoices");
+const { projectPnl, financeSummary, planProgress, installmentToInvoice } =
+  await import("../lib/finance");
 const budget = await import("../lib/budget");
 const T = await import("../lib/types");
 
@@ -78,7 +86,7 @@ async function getProject(id: string): Promise<Project | null> {
   return projects.find((p) => p.id === id) ?? null;
 }
 
-const server = new McpServer({ name: "console", version: "1.0.0" });
+const server = new McpServer({ name: "personal-dashboard", version: "1.0.0" });
 
 /* ------------------------------------------------------------------ overview */
 server.registerTool(
@@ -643,6 +651,12 @@ server.registerTool(
       title: z.string().optional(),
       currency: z.string().optional().describe("ISO code, default USD"),
       status: en(T.INVOICE_STATUSES).optional(),
+      channel: z
+        .string()
+        .optional()
+        .describe(
+          "Payment channel: bank | wise | paypal | stripe | cash | cheque | crypto | other (free-form ok)",
+        ),
       projectId: z.string().optional(),
       issuedDate: z.string().optional().describe("ISO yyyy-mm-dd"),
       dueDate: z.string().optional().describe("ISO yyyy-mm-dd"),
@@ -658,6 +672,7 @@ server.registerTool(
       title: a.title,
       currency: a.currency ?? "USD",
       status: a.status ?? "draft",
+      channel: a.channel,
       projectId: a.projectId,
       issuedDate: a.issuedDate ?? todayISO(),
       dueDate: a.dueDate,
@@ -682,6 +697,7 @@ server.registerTool(
       title: z.string().optional(),
       currency: z.string().optional(),
       status: en(T.INVOICE_STATUSES).optional(),
+      channel: z.string().optional(),
       projectId: z.string().optional(),
       issuedDate: z.string().optional(),
       dueDate: z.string().optional(),
@@ -704,6 +720,434 @@ server.registerTool(
   { description: "Delete an invoice by id.", inputSchema: { id: z.string() } },
   async ({ id }) =>
     text((await remove("invoices", id)) ? `Deleted ${id}` : `No invoice ${id}`),
+);
+
+/* -------------------------------------------------- recurring invoices */
+server.registerTool(
+  "list_recurring_invoices",
+  {
+    description: "List recurring invoice schedules (retainers, etc.).",
+    inputSchema: {},
+  },
+  async () => text(await readCollection("recurring-invoices")),
+);
+
+server.registerTool(
+  "add_recurring_invoice",
+  {
+    description:
+      "Create a recurring invoice schedule that issues a draft invoice on a cadence (typically a project retainer). Issuing is explicit — use generate_invoice_from_schedule.",
+    inputSchema: {
+      client: z.string(),
+      amount: z.number(),
+      cadence: en(T.INVOICE_CADENCES).describe(
+        "weekly | monthly | quarterly | yearly",
+      ),
+      nextDate: z.string().describe("ISO yyyy-mm-dd — next issue date"),
+      title: z.string().optional(),
+      currency: z.string().optional().describe("ISO code, default USD"),
+      channel: z.string().optional(),
+      projectId: z.string().optional(),
+      dueDays: z
+        .number()
+        .optional()
+        .describe("days from issue to due date, default 14"),
+      active: z.boolean().optional().describe("default true"),
+      notes: z.string().optional(),
+    },
+  },
+  async (a) => {
+    const record: RecurringInvoice = {
+      id: newId(),
+      client: a.client,
+      amount: a.amount,
+      cadence: a.cadence,
+      nextDate: a.nextDate,
+      title: a.title,
+      currency: a.currency ?? "USD",
+      channel: a.channel,
+      projectId: a.projectId,
+      dueDays: a.dueDays ?? 14,
+      active: a.active ?? true,
+      notes: a.notes,
+    };
+    await upsert("recurring-invoices", record);
+    return text({ added: record });
+  },
+);
+
+server.registerTool(
+  "update_recurring_invoice",
+  {
+    description: "Update a recurring schedule by id. Only provided fields change.",
+    inputSchema: {
+      id: z.string(),
+      client: z.string().optional(),
+      amount: z.number().optional(),
+      cadence: en(T.INVOICE_CADENCES).optional(),
+      nextDate: z.string().optional(),
+      title: z.string().optional(),
+      currency: z.string().optional(),
+      channel: z.string().optional(),
+      projectId: z.string().optional(),
+      dueDays: z.number().optional(),
+      active: z.boolean().optional(),
+      notes: z.string().optional(),
+    },
+  },
+  async ({ id, ...patch }) => {
+    const cur = (await readCollection("recurring-invoices")).find(
+      (s) => s.id === id,
+    );
+    if (!cur) return text(`No recurring invoice with id ${id}`);
+    const next = { ...cur, ...defined(patch) };
+    await upsert("recurring-invoices", next);
+    return text({ updated: next });
+  },
+);
+
+server.registerTool(
+  "generate_invoice_from_schedule",
+  {
+    description:
+      "Issue a draft invoice from a recurring schedule and advance its nextDate by one cadence step.",
+    inputSchema: { id: z.string() },
+  },
+  async ({ id }) => {
+    const schedule = (await readCollection("recurring-invoices")).find(
+      (s) => s.id === id,
+    );
+    if (!schedule) return text(`No recurring invoice with id ${id}`);
+    const invoice = materializeInvoice(schedule);
+    await upsert("invoices", invoice);
+    await upsert("recurring-invoices", {
+      ...schedule,
+      nextDate: advanceDate(schedule.nextDate, schedule.cadence),
+      lastGenerated: todayISO(),
+    });
+    return text({ generated: invoice });
+  },
+);
+
+server.registerTool(
+  "delete_recurring_invoice",
+  {
+    description: "Delete a recurring schedule by id.",
+    inputSchema: { id: z.string() },
+  },
+  async ({ id }) =>
+    text(
+      (await remove("recurring-invoices", id))
+        ? `Deleted ${id}`
+        : `No recurring invoice ${id}`,
+    ),
+);
+
+/* -------------------------------------------------------- payment plans */
+server.registerTool(
+  "list_payment_plans",
+  {
+    description:
+      "List payment plans (irregular invoice schedules) with per-installment billing status.",
+    inputSchema: {},
+  },
+  async () => {
+    const plans = await readCollection("payment-plans");
+    return text(plans.map((p) => ({ ...p, progress: planProgress(p) })));
+  },
+);
+
+server.registerTool(
+  "add_payment_plan",
+  {
+    description:
+      "Create a payment plan: several one-off installments billed on arbitrary dates against a project (e.g. 30% on signing, 40% at go-live, 30% on delivery).",
+    inputSchema: {
+      name: z.string(),
+      client: z.string(),
+      installments: z
+        .array(
+          z.object({
+            label: z.string().optional(),
+            date: z.string().describe("ISO yyyy-mm-dd — scheduled issue date"),
+            amount: z.number(),
+          }),
+        )
+        .describe("the staged installments"),
+      projectId: z.string().optional(),
+      currency: z.string().optional().describe("ISO code, default USD"),
+      channel: z.string().optional(),
+      dueDays: z.number().optional().describe("payment terms, default 14"),
+      notes: z.string().optional(),
+    },
+  },
+  async (a) => {
+    const record: PaymentPlan = {
+      id: newId(),
+      name: a.name,
+      client: a.client,
+      projectId: a.projectId,
+      currency: a.currency ?? "USD",
+      channel: a.channel,
+      dueDays: a.dueDays ?? 14,
+      notes: a.notes,
+      installments: a.installments.map((i) => ({
+        id: newId(),
+        label: i.label,
+        date: i.date,
+        amount: i.amount,
+      })),
+      createdAt: new Date().toISOString(),
+    };
+    await upsert("payment-plans", record);
+    return text({ added: record });
+  },
+);
+
+server.registerTool(
+  "add_plan_installment",
+  {
+    description: "Add an installment to an existing payment plan.",
+    inputSchema: {
+      planId: z.string(),
+      date: z.string().describe("ISO yyyy-mm-dd"),
+      amount: z.number(),
+      label: z.string().optional(),
+    },
+  },
+  async (a) => {
+    const plan = (await readCollection("payment-plans")).find(
+      (p) => p.id === a.planId,
+    );
+    if (!plan) return text(`No payment plan with id ${a.planId}`);
+    const inst: PlanInstallment = {
+      id: newId(),
+      label: a.label,
+      date: a.date,
+      amount: a.amount,
+    };
+    const next = { ...plan, installments: [...plan.installments, inst] };
+    await upsert("payment-plans", next);
+    return text({ updated: next });
+  },
+);
+
+server.registerTool(
+  "generate_plan_installment",
+  {
+    description:
+      "Issue a draft invoice for one plan installment and mark it billed.",
+    inputSchema: { planId: z.string(), installmentId: z.string() },
+  },
+  async ({ planId, installmentId }) => {
+    const plan = (await readCollection("payment-plans")).find(
+      (p) => p.id === planId,
+    );
+    if (!plan) return text(`No payment plan with id ${planId}`);
+    const inst = plan.installments.find((i) => i.id === installmentId);
+    if (!inst) return text(`No installment ${installmentId} in plan ${planId}`);
+    if (inst.invoiceId) return text(`Installment ${installmentId} already billed`);
+    const invoice = installmentToInvoice(plan, inst);
+    await upsert("invoices", invoice);
+    await upsert("payment-plans", {
+      ...plan,
+      installments: plan.installments.map((i) =>
+        i.id === installmentId ? { ...i, invoiceId: invoice.id } : i,
+      ),
+    });
+    return text({ generated: invoice });
+  },
+);
+
+server.registerTool(
+  "delete_payment_plan",
+  {
+    description:
+      "Delete a payment plan by id. Already-generated invoices are kept.",
+    inputSchema: { id: z.string() },
+  },
+  async ({ id }) =>
+    text(
+      (await remove("payment-plans", id)) ? `Deleted ${id}` : `No plan ${id}`,
+    ),
+);
+
+/* ------------------------------------------------ finance: expense accounts */
+server.registerTool(
+  "list_expense_accounts",
+  {
+    description: "List finance expense accounts (general expense buckets).",
+    inputSchema: {},
+  },
+  async () => text(await readCollection("expense-accounts")),
+);
+
+server.registerTool(
+  "add_expense_account",
+  {
+    description: "Create an expense account (e.g. Software, Travel, Taxes).",
+    inputSchema: {
+      name: z.string(),
+      color: z.string().optional().describe("hex color"),
+    },
+  },
+  async (a) => {
+    const record: ExpenseAccount = {
+      id: newId(),
+      name: a.name,
+      color: a.color,
+    };
+    await upsert("expense-accounts", record);
+    return text({ added: record });
+  },
+);
+
+server.registerTool(
+  "delete_expense_account",
+  {
+    description:
+      "Delete an expense account by id. Its expenses are kept but unfiled.",
+    inputSchema: { id: z.string() },
+  },
+  async ({ id }) => {
+    const expenses = await readCollection("finance-expenses");
+    for (const e of expenses) {
+      if (e.accountId === id) {
+        await upsert("finance-expenses", { ...e, accountId: undefined });
+      }
+    }
+    return text(
+      (await remove("expense-accounts", id))
+        ? `Deleted ${id}`
+        : `No account ${id}`,
+    );
+  },
+);
+
+/* ------------------------------------------------------- finance: expenses */
+server.registerTool(
+  "list_finance_expenses",
+  {
+    description:
+      "List work/finance expenses (distinct from the personal Budget). Optionally filter by projectId or accountId.",
+    inputSchema: {
+      projectId: z.string().optional(),
+      accountId: z.string().optional(),
+    },
+  },
+  async (a) => {
+    let items = await readCollection("finance-expenses");
+    if (a.projectId) items = items.filter((e) => e.projectId === a.projectId);
+    if (a.accountId) items = items.filter((e) => e.accountId === a.accountId);
+    return text(items);
+  },
+);
+
+server.registerTool(
+  "add_finance_expense",
+  {
+    description:
+      "Log a work expense. Link to a project (projectId, counts toward its P&L) and/or file under an account (accountId).",
+    inputSchema: {
+      amount: z.number(),
+      date: z.string().optional().describe("ISO yyyy-mm-dd, default today"),
+      vendor: z.string().optional(),
+      description: z.string().optional(),
+      currency: z.string().optional().describe("ISO code, default USD"),
+      accountId: z.string().optional(),
+      projectId: z.string().optional(),
+      channel: z.string().optional(),
+      notes: z.string().optional(),
+    },
+  },
+  async (a) => {
+    const record: FinanceExpense = {
+      id: newId(),
+      date: a.date ?? todayISO(),
+      amount: a.amount,
+      vendor: a.vendor,
+      description: a.description,
+      currency: a.currency ?? "USD",
+      accountId: a.accountId,
+      projectId: a.projectId,
+      channel: a.channel,
+      notes: a.notes,
+    };
+    await upsert("finance-expenses", record);
+    return text({ added: record });
+  },
+);
+
+server.registerTool(
+  "update_finance_expense",
+  {
+    description: "Update a finance expense by id. Only provided fields change.",
+    inputSchema: {
+      id: z.string(),
+      amount: z.number().optional(),
+      date: z.string().optional(),
+      vendor: z.string().optional(),
+      description: z.string().optional(),
+      currency: z.string().optional(),
+      accountId: z.string().optional(),
+      projectId: z.string().optional(),
+      channel: z.string().optional(),
+      notes: z.string().optional(),
+    },
+  },
+  async ({ id, ...patch }) => {
+    const cur = (await readCollection("finance-expenses")).find(
+      (e) => e.id === id,
+    );
+    if (!cur) return text(`No finance expense with id ${id}`);
+    const next = { ...cur, ...defined(patch) };
+    await upsert("finance-expenses", next);
+    return text({ updated: next });
+  },
+);
+
+server.registerTool(
+  "delete_finance_expense",
+  {
+    description: "Delete a finance expense by id.",
+    inputSchema: { id: z.string() },
+  },
+  async ({ id }) =>
+    text(
+      (await remove("finance-expenses", id)) ? `Deleted ${id}` : `No expense ${id}`,
+    ),
+);
+
+server.registerTool(
+  "get_project_finance",
+  {
+    description:
+      "Profit/loss for a project: received (paid), outstanding, drafted, linked expenses, and net (received − expenses).",
+    inputSchema: { projectId: z.string() },
+  },
+  async ({ projectId }) => {
+    const [invoices, expenses] = await Promise.all([
+      readCollection("invoices"),
+      readCollection("finance-expenses"),
+    ]);
+    return text(projectPnl(projectId, invoices, expenses));
+  },
+);
+
+server.registerTool(
+  "get_finance_summary",
+  {
+    description:
+      "Overall finance summary: received, outstanding, total expenses, and net profit.",
+    inputSchema: {},
+  },
+  async () => {
+    const [invoices, expenses] = await Promise.all([
+      readCollection("invoices"),
+      readCollection("finance-expenses"),
+    ]);
+    return text(financeSummary(invoices, expenses));
+  },
 );
 
 /* ---------------------------------------------------------------- templates */

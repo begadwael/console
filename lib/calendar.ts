@@ -124,7 +124,7 @@ export function buildAgenda({
         title: `Invoice · ${inv.client}`,
         sub: `${MODULE.income.label} · ${inv.title ?? ""}`.trim(),
         color: MODULE.income.color,
-        href: "/income",
+        href: MODULE.income.href,
       });
     }
   }

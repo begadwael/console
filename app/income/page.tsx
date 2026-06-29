@@ -1,15 +1,7 @@
-import { readCollection } from "@/lib/store";
-import { IncomeClient } from "./IncomeClient";
+import { redirect } from "next/navigation";
 
-export default async function IncomePage() {
-  const [invoices, projects] = await Promise.all([
-    readCollection("invoices"),
-    readCollection("projects"),
-  ]);
-  return (
-    <IncomeClient
-      invoices={invoices}
-      projects={projects.map((p) => ({ id: p.id, name: p.name }))}
-    />
-  );
+// Income moved under Side work → Finance. Keep this route as a permanent redirect so
+// old links and bookmarks still resolve.
+export default function IncomeRedirect() {
+  redirect("/sidework/finance");
 }

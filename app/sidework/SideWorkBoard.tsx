@@ -91,6 +91,13 @@ export function SideWorkBoard({ tasks }: { tasks: SideWorkTask[] }) {
         action={
           <div className="flex items-center gap-2">
             <Link
+              href="/sidework/finance"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
+            >
+              <Icons.finance size={15} />
+              Finance
+            </Link>
+            <Link
               href="/sidework/clients"
               className="inline-flex items-center gap-1.5 rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-hover hover:text-text"
             >
